@@ -1,0 +1,7 @@
+{
+    "preprocess_method": "preprocessIllumina",
+    "grouping_variable": "Sex",
+    "covariates": ["Age"], 
+    "are_covariates_factors": [false], 
+    "annotation_package": "IlluminaHumanMethylationEPICanno.ilm10b4.hg19"
+}
