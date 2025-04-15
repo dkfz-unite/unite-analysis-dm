@@ -38,9 +38,16 @@ results <- file.path(base_folder, "results.csv")
 
 # Write the results to the CSV file
 write.csv(coeff, results, row.names = TRUE)
+get_compressed_result(results, file.path(base_folder, "results.csv.gz"))
 
 #refactored results
 resultdata <- read.csv(results, fileEncoding = "UTF-8")
 reduced_results = get_refactored_result(resultdata)
 # Write the refactored results to the CSV file
-write.csv(reduced_results, file.path(base_folder, "results_reduced.csv"), row.names = TRUE)
+get_compressed_result(reduced_results, file.path(base_folder, "results_reduced.csv.gz"))
+file.remove(file.path(base_folder, "results.csv"))
+
+# Get annotation results
+annotated_results <- get_annotation_result(reduced_results)
+# Save annotated results
+get_compressed_result(annotated_results, file.path(base_folder, "results_annotated.csv.gz"))

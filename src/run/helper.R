@@ -1,7 +1,8 @@
 library(minfi)
 args = commandArgs(trailingOnly = T)
-package <- "IlluminaHumanMethylation450kmanifest"
-library(package, character.only = TRUE)
+analysis_package <- "IlluminaHumanMethylationEPICmanifest"
+library(analysis_package, character.only = TRUE)
+annotation_package <- "IlluminaHumanMethylationEPICanno.ilm10b4.hg19"
 
 #' Get Model Matrix
 #' @param metadata A data frame containing the meta data.
@@ -78,8 +79,9 @@ get_coeff <- function(coefficients)
 #'         with values rounded to six decimal places.
 get_refactored_result <- function(results)
 {
+    colnames(results)[colnames(results) == "X"] <- "CpgId"
     # Select only essential columns
-    essential_cols <- c("logFC", "adj.P.Val")
+    essential_cols <- c("CpgId", "logFC", "adj.P.Val")
     print(results)
     print(essential_cols)
     results <- results[, essential_cols, drop = FALSE]
@@ -87,4 +89,36 @@ get_refactored_result <- function(results)
     results$logFC <- round(results$logFC, 6)
     
     return (results);
+}
+
+#' Get annotation
+#' This function runs annotation for differential analysis results
+#' @param results A data frame containing the results of a differential analysis,
+#' @return annotated results with additional information from the annotation package.
+#' Steps:
+#' 1. Load annotation package
+#' 2. Merge DMA results with annotation
+#' 3. Select essential columns to avoid processing of large file
+#' 4. Enhancer is specific to 450/850K, so referring dynamically without specific types
+#' 5. Return the annotated results
+get_annotation_result <- function(results)
+{
+    anno <- getAnnotation(annotation_package)
+    results_annotated <- merge(results, anno, by.x = "CpgId", by.y = "Name", all.x = TRUE)
+    essential_cols <- c("CpgId", "logFC", "adj.P.Val","UCSC_RefGene_Name","Regulatory_Feature_Name")
+    enhancer_cols <- grep("Enhancer", names(results_annotated), value = TRUE, ignore.case = TRUE)
+    all_cols <- unique(c(essential_cols, enhancer_cols))
+    results_annotated <- results_annotated[, all_cols, drop = FALSE]
+    return(results_annotated);
+}
+
+#' compress result
+#' This function compresses the results file into a gzipped format.
+#' @param results A data frame containing the results to be compressed.
+#' @param gzfile_path The path where the gzipped file will be saved.
+#' @return None
+get_compressed_result <- function(results, gzfile_path) {
+    gz_con <- gzfile(gzfile_path, "wt")
+    write.csv(results, gz_con, row.names = TRUE)
+    close(gz_con)
 }
