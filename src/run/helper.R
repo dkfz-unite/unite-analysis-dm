@@ -3,6 +3,7 @@ args = commandArgs(trailingOnly = T)
 analysis_package <- "IlluminaHumanMethylationEPICmanifest"
 library(analysis_package, character.only = TRUE)
 annotation_package <- "IlluminaHumanMethylationEPICanno.ilm10b4.hg19"
+library(dplyr)
 
 #' Get Model Matrix
 #' @param metadata A data frame containing the meta data.
