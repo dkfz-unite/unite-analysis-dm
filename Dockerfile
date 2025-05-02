@@ -1,4 +1,4 @@
-FROM r-base:latest as base
+FROM r-base:latest AS base
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
@@ -12,7 +12,22 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-FROM install as final
+FROM base AS install
+COPY ./src/install /src
+WORKDIR /src
+RUN Rscript install.R && \
+    rm -rf /tmp/* \
+           /var/tmp/* \
+           /usr/lib/R/doc \
+           /usr/share/doc \
+           /usr/local/lib/R/site-library/*/doc \
+           /usr/local/lib/R/site-library/*/html \
+           /usr/local/lib/R/site-library/*/help \
+           /usr/local/lib/R/site-library/*/examples \
+           /usr/local/lib/R/site-library/*/tests \
+           /usr/local/lib/R/site-library/*/vignettes
+
+FROM install AS final
 COPY ./src/run /src
 COPY ./app /app
 WORKDIR /app
