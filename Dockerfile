@@ -1,14 +1,14 @@
-FROM ubuntu:latest as base
+FROM r-base:latest as base
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update
-RUN apt-get install -y r-base r-base-dev
+
+RUN apt-get update && \
+    apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libkrb5-dev && \
+    apt-get clean
 
 FROM base as install
 COPY ./src/install /src
 WORKDIR /src
-RUN apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
 RUN Rscript install.R
-RUN apt-get clean
 
 FROM install as final
 COPY ./src/run /src
