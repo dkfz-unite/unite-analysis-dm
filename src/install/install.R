@@ -7,12 +7,6 @@
 # BiocManager::install("dplyr", ask = T)
 
 install.packages("BiocManager", dependencies = FALSE)
-# BiocManager::install("minfi", ask = FALSE, update = FALSE, dependencies = c("Depends", "Imports"))
-# BiocManager::install("limma", ask = FALSE, update = FALSE, dependencies = c("Depends", "Imports"))
-# BiocManager::install("IlluminaHumanMethylation450kmanifest", ask = FALSE, update = FALSE, dependencies = c("Depends", "Imports"))
-# BiocManager::install("IlluminaHumanMethylationEPICmanifest", ask = FALSE, update = FALSE, dependencies = c("Depends", "Imports"))
-# BiocManager::install("IlluminaHumanMethylationEPICanno.ilm10b4.hg19", ask = FALSE, update = FALSE, dependencies = c("Depends", "Imports"))
-# BiocManager::install("dplyr", ask = FALSE, update = FALSE, dependencies = c("Depends", "Imports"))
 
 packages <- c(
     "minfi",
