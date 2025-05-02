@@ -113,30 +113,34 @@ get_refactored_result <- function(results)
 #' 3. Select essential columns to avoid processing of large file
 #' 4. Enhancer is specific to 450/850K, so referring dynamically without specific types
 #' 5. Return the annotated results
-get_annotation_result <- function(results)
+get_annotation_result<- function(results)
 {
     anno <- getAnnotation(annotation_package)
-    results_annotated <- merge(results, anno, by.x = "CpgId", by.y = "Name", all.x = TRUE)
+    results <- merge(results, anno, by.x = "CpgId", by.y = "Name", all.x = TRUE)
     essential_cols <- c("CpgId", "logFC", "adj.P.Val","UCSC_RefGene_Name","Regulatory_Feature_Name")
-    enhancer_cols <- grep("Enhancer", names(results_annotated), value = TRUE, ignore.case = TRUE)
+    enhancer_cols <- grep("Enhancer", names(results), value = TRUE, ignore.case = TRUE)
     all_cols <- unique(c(essential_cols, enhancer_cols))
-    results_annotated <- results_annotated[, all_cols, drop = FALSE]
-    results_annotated$adj.P.Val <- round(results_annotated$adj.P.Val, 4)
-    results_annotated$logFC <- round(results_annotated$logFC, 4)
-
+    missing_cols <- setdiff(all_cols, colnames(results))
+    if(length(missing_cols) > 0) {
+        stop(paste("Missing columns:", paste(missing_cols, collapse = ", ")))
+    }
+    results <- results[, all_cols, drop = FALSE]
+    results$adj.P.Val <- round(results$adj.P.Val, 4)
+    results$logFC <- round(results$logFC, 4)
+    
     # Step 1: Force proper numeric conversion
-    results_annotated$logFc <- as.numeric(results_annotated$logFC)
+    results$logFc <- as.numeric(results$logFC)
     # Step 2: Remove non-finite values (NA, NaN, Inf, -Inf)
-    results_annotated <- results[is.finite(results_annotated$logFC), ]
+    results <- results[is.finite(results$logFC), ]
     # Step 3: Now safely create bins
-    results_annotated$logFc_bin <- cut(results_annotated$logFC, breaks = 10)
-    results_annotated <- as.data.frame(results_annotated)
-    results_annotated <- results_annotated %>%
+    results$logFc_bin <- cut(results$logFC, breaks = 10)
+    results <- as.data.frame(results)
+    results <- results %>%
         group_by(logFc_bin) %>%
         sample_n(size = min(50000, n()), replace = FALSE) %>%
         ungroup()
-
-    return(results_annotated);
+    
+    return(results);
 }
 
 #' compress result
