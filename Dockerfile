@@ -1,16 +1,17 @@
 FROM r-base:latest AS base
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        software-properties-common \
-        libcurl4-openssl-dev \
-        libssl-dev \
-        libxml2-dev \
-        libkrb5-dev \
-        ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# RUN apt-get update && \
+#     apt-get install -y --no-install-recommends \
+#         libcurl4-openssl-dev \
+#         libssl-dev \
+#         libxml2-dev & \
+#         libkrb5-dev \
+#         ca-certificates && \
+#     apt-get clean && \
+#     rm -rf /var/lib/apt/lists/*
 
 FROM base AS install
 COPY ./src/install /src
