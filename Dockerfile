@@ -16,13 +16,16 @@ FROM base AS install
 COPY ./src/install /src
 WORKDIR /src
 RUN Rscript install.R && \
-rm -rf /tmp/* /var/tmp/* /usr/lib/R/doc /usr/share/doc && \
-rm -rf /usr/local/lib/R/site-library/*/doc \
-/usr/local/lib/R/site-library/*/html \
-/usr/local/lib/R/site-library/*/help \
-/usr/local/lib/R/site-library/*/examples \
-/usr/local/lib/R/site-library/*/tests \
-/usr/local/lib/R/site-library/*/vignettes
+    rm -rf /tmp/* \
+           /var/tmp/* \
+           /usr/lib/R/doc \
+           /usr/share/doc \
+           /usr/local/lib/R/site-library/*/doc \
+           /usr/local/lib/R/site-library/*/html \
+           /usr/local/lib/R/site-library/*/help \
+           /usr/local/lib/R/site-library/*/examples \
+           /usr/local/lib/R/site-library/*/tests \
+           /usr/local/lib/R/site-library/*/vignettes
 
 FROM install AS final
 COPY ./src/run /src
