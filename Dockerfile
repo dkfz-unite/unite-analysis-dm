@@ -1,29 +1,16 @@
 FROM ubuntu:latest AS base
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        r-base \
-        r-base-dev \
-        libcurl4-openssl-dev \
-        libssl-dev \
-        libxml2-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update
+RUN apt-get install -y r-base r-base-dev
 
 FROM base AS install
 COPY ./src/install /src
 WORKDIR /src
-RUN Rscript install.R && \
-    rm -rf /tmp/* \
-           /var/tmp/* \
-           /usr/lib/R/doc \
-           /usr/share/doc \
-           /usr/local/lib/R/site-library/*/doc \
-           /usr/local/lib/R/site-library/*/html \
-           /usr/local/lib/R/site-library/*/help \
-           /usr/local/lib/R/site-library/*/examples \
-           /usr/local/lib/R/site-library/*/tests \
-           /usr/local/lib/R/site-library/*/vignettes
+
+RUN apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+RUN Rscript install.R
+RUN apt-get clean
 
 FROM install AS final
 COPY ./src/run /src
