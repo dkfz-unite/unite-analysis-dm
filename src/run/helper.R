@@ -26,7 +26,7 @@ get_model_matrix <- function(metadata)
 #' default preprocessing type set is preprocessIllumina
 get_m_values <- function(metadata, opts) {
     # Read IDAT files
-    RGset <- read.metharray(metadata$path, extended = TRUE)
+    RGset <- read.metharray(metadata$path, extended = TRUE, force= TRUE)
     preprocess_method = opts$pp
     if (preprocess_method == "preprocessSWAN") {
         Mset <- preprocessSWAN(RGset)
@@ -80,7 +80,6 @@ get_coeff <- function(coefficients)
 #'         with values rounded to six decimal places.
 get_refactored_result <- function(results)
 {
-    colnames(results)[colnames(results) == "X"] <- "CpgId"
     # Select only essential columns
     essential_cols <- c("CpgId", "logFC", "adj.P.Val")
     print(results)
@@ -150,6 +149,6 @@ get_annotation_result<- function(results)
 #' @return None
 get_compressed_result <- function(results, gzfile_path) {
     gz_con <- gzfile(gzfile_path, "wt")
-    write.csv(results, gz_con, row.names = TRUE)
+    write.table(results, gz_con, row.names = FALSE, quote = FALSE, sep = "\t")
     close(gz_con)
 }
