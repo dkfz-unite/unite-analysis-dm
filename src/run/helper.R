@@ -141,14 +141,3 @@ get_annotation_result<- function(results)
     
     return(results);
 }
-
-#' compress result
-#' This function compresses the results file into a gzipped format.
-#' @param results A data frame containing the results to be compressed.
-#' @param gzfile_path The path where the gzipped file will be saved.
-#' @return None
-get_compressed_result <- function(results, gzfile_path) {
-    gz_con <- gzfile(gzfile_path, "wt")
-    write.table(results, gz_con, row.names = FALSE, quote = FALSE, sep = "\t")
-    close(gz_con)
-}

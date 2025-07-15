@@ -35,13 +35,18 @@ base_folder <- gsub("/Donor.*/.*", "/", metadata$path[1])
 # Get differential methylation results
 results <- topTable(fit2, coef = coeffOpt, number = Inf, adjust = "fdr")
 
-# Write the results to the CSV file
+# Binding CpgId to results
 results <- cbind(CpgId = rownames(results), results)
 
 #refactored results
 reduced_results = get_refactored_result(results)
+rm(results)
 
 # Get annotation results
 annotated_results <- get_annotation_result(reduced_results)
+rm(reduced_results)
+
 # Save annotated results
- get_compressed_result(annotated_results, file.path(base_folder, "results.tsv.gz"))
+write.table(annotated_results, file.path(base_folder, "results.tsv"), row.names = FALSE, quote = FALSE, sep = "\t")
+rm(annotated_results)
+gc()
