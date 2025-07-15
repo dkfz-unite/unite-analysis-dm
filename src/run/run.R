@@ -17,7 +17,7 @@ m_values = get_m_values(metadata, opts)
 # Create design matrix
 design = get_model_matrix(metadata)
 
-colnames(design) <- levels(metadata$conditions)
+colnames(design) <- levels(metadata$condition)
 
 # Fit linear model for M-values
 fit <- lmFit(m_values, design)
@@ -37,14 +37,11 @@ results <- topTable(fit2, coef = coeffOpt, number = Inf, adjust = "fdr")
 
 # Write the results to the CSV file
 results <- cbind(CpgId = rownames(results), results)
-get_compressed_result(results, file.path(base_folder, "results.tsv.gz"))
 
 #refactored results
 reduced_results = get_refactored_result(results)
-# Write the refactored results to the CSV file
-get_compressed_result(reduced_results, file.path(base_folder, "results_reduced.tsv.gz"))
 
 # Get annotation results
 annotated_results <- get_annotation_result(reduced_results)
 # Save annotated results
-get_compressed_result(annotated_results, file.path(base_folder, "results_annotated.tsv.gz"))
+ get_compressed_result(annotated_results, file.path(base_folder, "results.tsv.gz"))

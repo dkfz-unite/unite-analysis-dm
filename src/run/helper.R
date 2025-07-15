@@ -11,7 +11,7 @@ library(dplyr)
 get_model_matrix <- function(metadata)
 {
     # create the model formula
-    model_string = as.formula(paste("~", "conditions"))
+    model_string = as.formula(paste("~", "condition"))
     
     # Create design matrix
     design <- model.matrix(model_string, data = metadata)
@@ -28,13 +28,13 @@ get_m_values <- function(metadata, opts) {
     # Read IDAT files
     RGset <- read.metharray(metadata$path, extended = TRUE, force= TRUE)
     preprocess_method = opts$pp
-    if (preprocess_method == "preprocessSWAN") {
+    if (preprocess_method == "SWAN") {
         Mset <- preprocessSWAN(RGset)
-    } else if (preprocess_method == "preprocessQuantile") {
+    } else if (preprocess_method == "Quantile") {
         Mset <- preprocessQuantile(RGset)
-    } else if (preprocess_method == "preprocessNoob") {
+    } else if (preprocess_method == "Noob") {
         Mset <- preprocessNoob(RGset)
-    } else if (preprocess_method == "preprocessRaw") {
+    } else if (preprocess_method == "Raw") {
         Mset <- preprocessRaw(RGset)
     } else {
         Mset <- preprocessIllumina(RGset)
@@ -50,9 +50,9 @@ get_m_values <- function(metadata, opts) {
 get_updated_metadata <- function(metadata)
 {
     # Convert 'Group' to factor with automatically generated levels
-    metadata$conditions <- factor(metadata$conditions, 
-                                    levels = unique(metadata$conditions), 
-                                    labels = paste0("conditions", seq_along(unique(metadata$conditions))))
+    metadata$condition <- factor(metadata$condition, 
+                                    levels = unique(metadata$condition), 
+                                    labels = paste0("condition", seq_along(unique(metadata$condition))))
     return (metadata);
 }
 
