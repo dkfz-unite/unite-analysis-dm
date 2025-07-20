@@ -11,7 +11,7 @@ library(dplyr)
 get_model_matrix <- function(metadata)
 {
     # create the model formula
-    model_string = as.formula(paste("~", "conditions"))
+    model_string = as.formula(paste("~", "condition"))
     
     # Create design matrix
     design <- model.matrix(model_string, data = metadata)
@@ -26,15 +26,15 @@ get_model_matrix <- function(metadata)
 #' default preprocessing type set is preprocessIllumina
 get_m_values <- function(metadata, opts) {
     # Read IDAT files
-    RGset <- read.metharray(metadata$path, extended = TRUE)
+    RGset <- read.metharray(metadata$path, extended = TRUE, force= TRUE)
     preprocess_method = opts$pp
-    if (preprocess_method == "preprocessSWAN") {
+    if (preprocess_method == "SWAN") {
         Mset <- preprocessSWAN(RGset)
-    } else if (preprocess_method == "preprocessQuantile") {
+    } else if (preprocess_method == "Quantile") {
         Mset <- preprocessQuantile(RGset)
-    } else if (preprocess_method == "preprocessNoob") {
+    } else if (preprocess_method == "Noob") {
         Mset <- preprocessNoob(RGset)
-    } else if (preprocess_method == "preprocessRaw") {
+    } else if (preprocess_method == "Raw") {
         Mset <- preprocessRaw(RGset)
     } else {
         Mset <- preprocessIllumina(RGset)
@@ -50,9 +50,9 @@ get_m_values <- function(metadata, opts) {
 get_updated_metadata <- function(metadata)
 {
     # Convert 'Group' to factor with automatically generated levels
-    metadata$conditions <- factor(metadata$conditions, 
-                                    levels = unique(metadata$conditions), 
-                                    labels = paste0("conditions", seq_along(unique(metadata$conditions))))
+    metadata$condition <- factor(metadata$condition, 
+                                    levels = unique(metadata$condition), 
+                                    labels = paste0("condition", seq_along(unique(metadata$condition))))
     return (metadata);
 }
 
@@ -80,7 +80,6 @@ get_coeff <- function(coefficients)
 #'         with values rounded to six decimal places.
 get_refactored_result <- function(results)
 {
-    colnames(results)[colnames(results) == "X"] <- "CpgId"
     # Select only essential columns
     essential_cols <- c("CpgId", "logFC", "adj.P.Val")
     print(results)
@@ -141,15 +140,4 @@ get_annotation_result<- function(results)
         ungroup()
     
     return(results);
-}
-
-#' compress result
-#' This function compresses the results file into a gzipped format.
-#' @param results A data frame containing the results to be compressed.
-#' @param gzfile_path The path where the gzipped file will be saved.
-#' @return None
-get_compressed_result <- function(results, gzfile_path) {
-    gz_con <- gzfile(gzfile_path, "wt")
-    write.csv(results, gz_con, row.names = TRUE)
-    close(gz_con)
 }

@@ -17,7 +17,7 @@ m_values = get_m_values(metadata, opts)
 # Create design matrix
 design = get_model_matrix(metadata)
 
-colnames(design) <- levels(metadata$conditions)
+colnames(design) <- levels(metadata$condition)
 
 # Fit linear model for M-values
 fit <- lmFit(m_values, design)
@@ -33,21 +33,20 @@ base_folder <- gsub("/Donor.*/.*", "/", metadata$path[1])
 
 
 # Get differential methylation results
-coeff <- topTable(fit2, coeffOpt, number = Inf, adjust = "fdr")
-results <- file.path(base_folder, "results.csv")
+results <- topTable(fit2, coef = coeffOpt, number = Inf, adjust = "fdr")
 
-# Write the results to the CSV file
-write.csv(coeff, results, row.names = TRUE)
-get_compressed_result(results, file.path(base_folder, "results.csv.gz"))
+# Binding CpgId to results
+results <- cbind(CpgId = rownames(results), results)
 
 #refactored results
-resultdata <- read.csv(results, fileEncoding = "UTF-8")
-reduced_results = get_refactored_result(resultdata)
-# Write the refactored results to the CSV file
-get_compressed_result(reduced_results, file.path(base_folder, "results_reduced.csv.gz"))
-file.remove(file.path(base_folder, "results.csv"))
+reduced_results = get_refactored_result(results)
+rm(results)
 
 # Get annotation results
 annotated_results <- get_annotation_result(reduced_results)
+rm(reduced_results)
+
 # Save annotated results
-get_compressed_result(annotated_results, file.path(base_folder, "results_annotated.csv.gz"))
+write.table(annotated_results, file.path(base_folder, "results.tsv"), row.names = FALSE, quote = FALSE, sep = "\t")
+rm(annotated_results)
+gc()
