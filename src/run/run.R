@@ -2,17 +2,22 @@ library(minfi)
 library(limma)
 library(jsonlite)
 source("helper.R")
-opts <- fromJSON(args[2])
 
-args = commandArgs(trailingOnly = T)
+args = commandArgs(trailingOnly = TRUE)
 
-metadata <- read.table(file = args[1], header = T, sep = "\t", check.names = F)
+inputFilePath <- args[1]
+outputFilePath <- args[3]
+optionsFilePath <- args[2]
+
+options <- fromJSON(optionsFilePath)
+
+metadata <- read.table(file = inputFilePath, header = T, sep = "\t", check.names = F)
 
 # Convert 'Group' to factor with automatically generated levels
 metadata = get_updated_metadata(metadata)
 
 # get m-values
-m_values = get_m_values(metadata, opts)
+m_values = get_m_values(metadata, options)
 
 # Create design matrix
 design = get_model_matrix(metadata)
@@ -27,10 +32,6 @@ fit2 <- eBayes(fit)
 
 # Get the coefficient
 coeffOpt <- get_coeff(coefficients)
-
-# Extract base folder from the first row of metadata$path
-base_folder <- gsub("/Donor.*/.*", "/", metadata$path[1])
-
 
 # Get differential methylation results
 results <- topTable(fit2, coef = coeffOpt, number = Inf, adjust = "fdr")
@@ -47,6 +48,6 @@ annotated_results <- get_annotation_result(reduced_results)
 rm(reduced_results)
 
 # Save annotated results
-write.table(annotated_results, file.path(base_folder, "results.tsv"), row.names = FALSE, quote = FALSE, sep = "\t")
+write.table(annotated_results, outputFilePath, row.names = FALSE, quote = FALSE, sep = "\t")
 rm(annotated_results)
 gc()
